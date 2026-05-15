@@ -4,14 +4,14 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - 8910:8000
+      - "8910:8000"
     restart: unless-stopped
     environment:
       DATABASE_URL: "postgres://postgres:postgres@db:5432/horilla"
+      DJANGO_SETTINGS_MODULE: "horilla.settings"
     command: sh ./entrypoint.sh
     volumes:
-      - ./horilla:/app/horilla
-      - ./media:/app/media
+      - horilla-media:/app/media
     depends_on:
       db:
         condition: service_healthy
@@ -25,16 +25,16 @@ services:
       POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
-      - 5438:5432
+      - "5438:5432"
     restart: unless-stopped
     volumes:
       - horilla-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "horilla"]
       interval: 10s
       timeout: 5s
       retries: 5
 
 volumes:
-     horilla-data:
-     horilla-media:
+  horilla-data:
+  horilla-media:
